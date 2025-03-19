@@ -9,7 +9,9 @@ const app = express();
 
 // Set up file upload storage
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage
+});
 
 const corsOptions = {
   origin: 'http://localhost:5173',
@@ -30,10 +32,17 @@ const transporter = nodemailer.createTransport({
 });
 
 app.post('/api/contact', async (req, res) => {
-  const { firstName, email, number, message } = req.body;
+  const {
+    firstName,
+    email,
+    number,
+    message
+  } = req.body;
 
   if (!firstName || !email || !number || !message) {
-    return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({
+      error: 'All fields are required'
+    });
   }
 
   try {
@@ -64,21 +73,34 @@ app.post('/api/contact', async (req, res) => {
       `,
     });
 
-    res.status(200).json({ message: 'Email sent successfully' });
+    res.status(200).json({
+      message: 'Email sent successfully'
+    });
   } catch (error) {
     console.error('Error sending email:', error);
-    res.status(500).json({ error: 'Failed to send email' });
+    res.status(500).json({
+      error: 'Failed to send email'
+    });
   }
 });
 
 
 // Paper submission endpoint
 app.post('/api/submit-paper', upload.single('file'), async (req, res) => {
-  const { title, email, fullName, mobileNumber, institution, firstAuthorCategory } = req.body;
+  const {
+    title,
+    email,
+    fullName,
+    institution,
+    category,
+    abstract
+  } = req.body; // Updated field names
   const file = req.file;
 
   if (!file) {
-    return res.status(400).json({ error: 'No file uploaded' });
+    return res.status(400).json({
+      error: 'No file uploaded'
+    });
   }
 
   try {
@@ -92,17 +114,15 @@ app.post('/api/submit-paper', upload.single('file'), async (req, res) => {
         <p><strong>Title:</strong> ${title}</p>
         <p><strong>Name:</strong> ${fullName}</p>
         <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Mobile:</strong> ${mobileNumber}</p>
         <p><strong>Institution:</strong> ${institution}</p>
-        <p><strong>Author Category:</strong> ${firstAuthorCategory}</p>
+        <p><strong>Author Category:</strong> ${category}</p> <!-- Updated field name -->
+        <p><strong>Abstract:</strong> ${abstract}</p> <!-- Updated field name -->
       `,
-      attachments: [
-        {
-          filename: file.originalname,
-          content: file.buffer,
-          contentType: 'application/pdf',
-        },
-      ],
+      attachments: [{
+        filename: file.originalname,
+        content: file.buffer,
+        contentType: 'application/pdf',
+      }, ],
     });
 
     // Send confirmation email to user
@@ -119,10 +139,14 @@ app.post('/api/submit-paper', upload.single('file'), async (req, res) => {
       `,
     });
 
-    res.status(200).json({ message: 'Paper submitted successfully' });
+    res.status(200).json({
+      message: 'Paper submitted successfully'
+    });
   } catch (error) {
     console.error('Error submitting paper:', error);
-    res.status(500).json({ error: 'Failed to submit paper' });
+    res.status(500).json({
+      error: 'Failed to submit paper'
+    });
   }
 });
 
